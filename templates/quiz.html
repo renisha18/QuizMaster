@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Take the Quiz</title>
+</head>
+<body>
+    <h1>Answer the Questions</h1>
+    <form action="/submit_answers" method="POST">
+        <label>Enter your name:</label>
+        <input type="text" name="username" required><br><br>
+
+        {% for q in questions %}
+            <div>
+                <p><strong>Q{{ loop.index }}:</strong> {{ q.question_text }}</p>
+                <input type="radio" name="question_{{ q.id }}" value="1" required> {{ q.option1 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="2"> {{ q.option2 }}<br>
+                <input type="radio" name="question_{{ q.id }}" value="3"> {{ q.option3 }}<br>
+            </div>
+            <hr>
+        {% endfor %}
+
+        <button type="submit">Submit Answers</button>
+    </form>
+</body>
+</html>
