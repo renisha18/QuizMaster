@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Take the Quiz</title>
+    <title>TAKE THE QUIZ </title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
     <h1>Answer the Questions</h1>
-    <form action="/submit_answers" method="POST">
-        <label>Enter your name:</label>
-        <input type="text" name="username" required><br><br>
-
+    <form action="{{ url_for('submit_answers', category_id=category_id) }}" method="POST">
+        <input type="hidden" name="category_id" value="{{ category_id }}">
         {% for q in questions %}
             <div>
                 <p><strong>Q{{ loop.index }}:</strong> {{ q.question_text }}</p>

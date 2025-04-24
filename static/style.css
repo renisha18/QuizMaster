@@ -1,4 +1,107 @@
-/* Base styling */
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(120deg, #a8dadc, #457b9d);
+    color: #1d3557;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Headings */
+h1, h2, h3 {
+    text-align: center;
+    color: #1d3557;
+}
+
+/* Forms */
+form {
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f1faee;
+    border: 1px solid #1d3557;
+    border-radius: 10px;
+}
+
+input[type="text"], input[type="email"], input[type="password"], select {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #457b9d;
+    border-radius: 5px;
+    background-color: #edf6f9;
+}
+
+button, input[type="submit"] {
+    background-color: #1d3557;
+    color: #f1faee;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover, input[type="submit"]:hover {
+    background-color: #457b9d;
+}
+
+/* Links */
+a {
+    color: #457b9d;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Tables */
+table {
+    width: 100%;
+    margin: 20px 0;
+    border-collapse: collapse;
+    background-color: #f1faee;
+}
+
+td, th {
+    border: 1px solid #1d3557;
+    padding: 8px;
+    text-align: center;
+}
+
+th {
+    background-color: #457b9d;
+    color: #f1faee;
+}
+
+/* Buttons */
+button[type="button"] {
+    background-color: #a8dadc;
+    color: #1d3557;
+    padding: 10px;
+    border: 1px solid #457b9d;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button[type="button"]:hover {
+    background-color: #457b9d;
+    color: #f1faee;
+}
+
+/* Fieldsets */
+fieldset {
+    border: 1px solid #1d3557;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #edf6f9;
+}
+
+legend {
+    color: #1d3557;
+}
+/* Base Styling */
 body {
     margin: 0;
     padding: 30px;
@@ -7,53 +110,68 @@ body {
     color: #064663;
 }
 
-h1, h2 {
-    text-align: center;
-    color: #064663;
+/* Headings */
+h1 {
+    color: #11698e;
     margin-bottom: 20px;
+    text-align: center;
+    font-size: 32px;
+}
+
+h2 {
+    color: #0b5c75;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 24px;
+}
+
+/* Unordered List */
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+ul li {
+    background-color: #edf6f9;
+    margin: 10px 0;
+    padding: 10px 15px;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+ul li a {
+    color: #064663;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+ul li a:hover {
+    color: #0b5c75;
 }
 
 /* Forms */
 form {
     width: 100%;
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: 25px;
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
     background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-fieldset {
-    border: 2px solid #a0d8ef;
-    border-radius: 10px;
-    padding: 15px;
-    margin-bottom: 20px;
-}
-
-legend, label {
-    font-weight: bold;
-    color: #11698e;
-}
-
-input[type="text"],
-input[type="email"],
-select {
+input[type="text"] {
     width: 100%;
     padding: 10px;
-    margin-top: 5px;
     margin-bottom: 15px;
     border: 1px solid #aad8d3;
     border-radius: 6px;
     font-size: 16px;
 }
 
-input[type="radio"] {
-    margin: 5px 10px 0 0;
-}
-
-/* Buttons */
-input[type="submit"],
 button {
     padding: 12px 30px;
     background-color: #11698e;
@@ -64,83 +182,18 @@ button {
     border-radius: 8px;
     cursor: pointer;
     display: block;
-    margin: 20px auto;
+    margin: 0 auto;
     transition: background-color 0.3s ease;
 }
 
-input[type="submit"]:hover,
 button:hover {
     background-color: #0b5c75;
 }
 
-/* Tables */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    margin: 0 auto 40px auto;
-}
-
-th, td {
-    border: 1px solid #ccc;
-    padding: 12px 16px;
-    text-align: center;
-}
-
-th {
-    background-color: #00796b;
-    color: white;
-}
-
-tr:nth-child(even) {
-    background-color: #f9f9f9;
-}
-
-tr:hover {
-    background-color: #e0f7fa;
-}
-
+/* Horizontal Rule */
 hr {
     border: none;
     height: 1px;
     background-color: #cceeff;
     margin: 20px 0;
-}
-
-/* Anchor Button Wrapper */
-a button {
-    margin-top: 10px;
-}
-body {
-    
-    padding: 30px;
-    background: linear-gradient(to right, #d0f0f3, #e6f7ff);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    color: #064663;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-}
-
-h1 {
-    color: #11698e;
-    margin-bottom: 10px;
-    font-size: 32px;
-}
-
-h2 {
-    color: #0b5c75;
-    margin-bottom: 20px;
-    font-size: 24px;
-}
-
-p {
-    font-size: 20px;
-    background-color: #ffffff;
-    padding: 15px 25px;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    color: #064663;
 }

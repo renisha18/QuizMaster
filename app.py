@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import mysql.connector
 
 app = Flask(__name__)
@@ -13,89 +13,152 @@ db = mysql.connector.connect(
 )
 cursor = db.cursor(dictionary=True)
 
-# Function to reconnect DB if needed
+
 def get_db_connection():
     if not db.is_connected():
         db.reconnect()
     return db
 
 # ------------------ Home/User Registration ------------------
-
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/')
 def index():
-    name = ""
-    email = ""
-    role = ""
+    return redirect(url_for('login'))
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if request.method == 'POST':
+        name = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        role = request.form['role']
+
+        cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
+        existing_user = cursor.fetchone()
+
+        if existing_user:
+            return "⚠️ Email already registered. Please log in instead."
+
+        cursor.execute("INSERT INTO users (username, email, password, role) VALUES (%s, %s, %s, %s)",
+                       (name, email, password, role))
+        db.commit()
+
+        session['username'] = name
+
+        if role == 'teacher':
+            return redirect('/new_quiz')
+        else:
+            return redirect('/quiz')
+
+    return render_template('signup.html')
+
+
+# ------------------ Login ------------------
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        name = request.form['username']
+        password = request.form['password']
+
+        cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (name, password))
+        user = cursor.fetchone()
+
+        if user:
+            session['username'] = name
+            role = user['role']
+            if role == 'teacher':
+                return redirect('/new_quiz')
+            else:
+                return redirect('/quiz')
+        else:
+            return "❌ Incorrect username or password."
+
+    return render_template('login.html')
+
+# ------------------ Teacher: Add New Category ------------------
+
+@app.route('/new_quiz', methods=['GET', 'POST'])
+def new_quiz():
+    cursor = db.cursor(dictionary=True)
+
+    # Fetch existing quiz categories
+    cursor.execute("SELECT * FROM categories")
+    categories = cursor.fetchall()
 
     if request.method == 'POST':
-        userdetails = request.form
-        name = userdetails['username']
-        email = userdetails['email']
-        role = userdetails['role']
+        category_name = request.form['category_name']
+        cursor.execute("INSERT INTO categories (name) VALUES (%s)", (category_name,))
+        db.commit()
+        return redirect('/new_quiz')  # refresh page after adding new category
 
-        try:
-            conn = get_db_connection()
-            cursor = conn.cursor(dictionary=True)
+    return render_template('new_quiz.html', categories=categories)
 
-            cursor.execute("SELECT * FROM users WHERE email = %s", (email,))
-            existing_user = cursor.fetchone()
-
-            if existing_user:
-                cursor.close()
-                return "⚠️ This email is already registered!"
-
-            cursor.execute("INSERT INTO users (username, email, role) VALUES (%s, %s, %s)", (name, email, role))
-            conn.commit()
-            cursor.close()
-            if role == 'teacher':
-                return redirect('/main')
-            elif role == 'student':
-                return redirect('/quiz')
-
-        except Exception as e:
-            return f"Failed to add user: {e}"
-
-    return render_template('index.html', name=name, email=email, role=role)
-
-# ------------------ Load Question Form ------------------
-
-@app.route('/main')
-def main():
-    return render_template('questions_form.html')
-
-# ------------------ Submit Questions ------------------
-
-@app.route('/submit_questions', methods=['POST'])
-def submit_questions():
-    for i in range(1, 6):  # 5 questions
-        question = request.form.get(f'question{i}')
-        option1 = request.form.get(f'option1_{i}')
-        option2 = request.form.get(f'option2_{i}')
-        option3 = request.form.get(f'option3_{i}')
-        correct_option = int(request.form.get(f'correct{i}'))
-
-        cursor.execute('''
-            INSERT INTO questions (question_text, option1, option2, option3, correct_option)
-            VALUES (%s, %s, %s, %s, %s)
-        ''', (question, option1, option2, option3, correct_option))
-
+@app.route("/add_category", methods=["POST"])
+def add_category():
+    category_name = request.form["category"]
+    cursor.execute("INSERT INTO categories (name) VALUES (%s)", (category_name,))
     db.commit()
-    return "✅ Questions saved successfully!"
+    category_id = cursor.lastrowid
+    return redirect(url_for("add_questions", category_id=category_id))
 
-# ------------------ Show Quiz Page ------------------
+
+# ------------------ Teacher: Add Questions ------------------
+
+@app.route("/add_questions/<int:category_id>")
+def add_questions(category_id):
+    cursor.execute("SELECT name FROM categories WHERE id = %s", (category_id,))
+    category = cursor.fetchone()
+    return render_template("questions_form.html", category_id=category_id, category_name=category["name"])
+
+@app.route("/submit_questions/<int:category_id>", methods=["POST"])
+def submit_questions(category_id):
+    try:
+        for i in range(1, 6):
+            question = request.form[f"question{i}"]
+            option1 = request.form[f"option1_{i}"]
+            option2 = request.form[f"option2_{i}"]
+            option3 = request.form[f"option3_{i}"]
+            correct = request.form[f"correct_{i}"]
+
+            cursor.execute("""
+                INSERT INTO questions (category_id, question_text, option1, option2, option3, correct_option)
+                VALUES (%s, %s, %s, %s, %s, %s)
+            """, (category_id, question, option1, option2, option3, correct))
+
+        db.commit()
+        return "✅ Questions saved successfully!"
+    
+    except Exception as e:
+        db.rollback()
+        return f"❌ Error saving questions: {str(e)}"
+
+# ------------------ Student: Take Quiz ------------------
 
 @app.route('/quiz')
 def quiz():
-    cursor.execute("SELECT * FROM questions")
-    questions = cursor.fetchall()
-    return render_template('quiz.html', questions=questions)
+    cursor.execute("SELECT * FROM categories")
+    categories = cursor.fetchall()
+    return render_template("quiz_categories.html", categories=categories)
 
-# ------------------ Submit Quiz Answers ------------------
+@app.route('/quiz/<int:category_id>')
+def show_quiz(category_id):
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM questions WHERE category_id = %s", (category_id,))
+    questions = cursor.fetchall()
+    
+    # Optional: Fetch category name if you want to show it in the page
+    cursor.execute("SELECT name FROM categories WHERE id = %s", (category_id,))
+    category = cursor.fetchone()
+    
+    cursor.close()
+    return render_template("quiz.html", questions=questions, category=category,category_id=category_id)
 
 @app.route('/submit_answers', methods=['POST'])
 def submit_answers():
-    username = request.form.get('username')
+    username = session.get('username') 
     score = 0
+    category_id = request.form.get('category_id')
 
     cursor.execute("SELECT * FROM questions")
     questions = cursor.fetchall()
@@ -106,30 +169,40 @@ def submit_answers():
         if user_answer and int(user_answer) == question['correct_option']:
             score += 10
 
-    cursor.execute("INSERT INTO scores (username, score) VALUES (%s, %s)", (username, score))
+    cursor.execute("INSERT INTO scores (username, score, category_id) VALUES (%s, %s, %s)", (username, score, category_id))
     db.commit()
 
     return render_template('result.html', username=username, score=score)
 
-# ------------------ View Users & Scores ------------------
+
+
+
+# ------------------ View Scores and Question Sets ------------------
 
 @app.route('/users')
 def users():
-    try:
-        conn = get_db_connection()
+    cursor.execute("SELECT * FROM scores")
+    users = cursor.fetchall()
+    return render_template('users.html', users=users)
 
-        if conn.is_connected():
-            cursor = conn.cursor(dictionary=True)
-            cursor.execute("SELECT * FROM scores")
-            users = cursor.fetchall()
-            cursor.close()
-            return render_template('users.html', users=users)
-        else:
-            return 'Failed to connect to MySQL.'
+@app.route("/question_sets")
+def view_question_sets():
+    cursor.execute("SELECT * FROM categories")
+    categories = cursor.fetchall()
+    return render_template("view_question_sets.html", categories=categories)
 
-    except Exception as e:
-        return f"Failed to fetch users: {e}"
+@app.route("/view_questions/<int:category_id>")
+def view_questions_in_category(category_id):
+    cursor.execute("SELECT name FROM categories WHERE id = %s", (category_id,))
+    category = cursor.fetchone()
 
+    cursor.execute("SELECT * FROM questions WHERE category_id = %s", (category_id,))
+    questions = cursor.fetchall()
+
+    cursor.execute("SELECT username, score FROM scores WHERE category_id = %s", (category_id,))
+    scores = cursor.fetchall()
+
+    return render_template("view_questions.html", category=category, questions=questions, scores=scores)
 # ------------------ Run App ------------------
 
 if __name__ == '__main__':

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Questions & Scores</title>
+</head>
+<body>
+    <h2>Questions in {{ category.name }}</h2>
+    <ol>
+      {% for q in questions %}
+        <li>
+          <strong>{{ q.question_text }}</strong><br>
+          A. {{ q.option1 }}<br>
+          B. {{ q.option2 }}<br>
+          C. {{ q.option3 }}<br>
+          <b>Correct Answer:</b> Option {{ q.correct_option }}
+        </li>
+      {% endfor %}
+    </ol>
+
+    <h2>Student Scores for {{ category.name }}</h2>
+    <table border="1" cellpadding="8" cellspacing="0">
+        <tr>
+            <th>Student</th>
+            <th>Score</th>
+        </tr>
+        {% for s in scores %}
+        <tr>
+            <td>{{ s.username }}</td>
+            <td>{{ s.score }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <br>
+    <a href="{{ url_for('new_quiz') }}">🔙 Back to Categories</a>
+</body>
+</html>

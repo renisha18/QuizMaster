@@ -5,32 +5,35 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <a href="{{ url_for('users') }}">
-        <button type="button">Check scores of students</button>
+    <a href="{{ url_for('new_quiz') }}">
+        <button type="button">🔙 Back to Categories</button>
     </a>
-    <h1>Enter 5 Questions</h1>
-    <form action="/submit_questions" method="POST">
+
+    <h1>Enter 5 Questions for Category: <span style="color:green">{{ category_name }}</span></h1>
+
+    <form action="{{ url_for('submit_questions', category_id=category_id) }}" method="POST">
         {% for i in range(1, 6) %}
             <fieldset>
                 <legend>Question {{ i }}</legend>
+
                 <label>Question:</label><br>
                 <input type="text" name="question{{ i }}" required><br><br>
 
                 <label>Option 1:</label>
                 <input type="text" name="option1_{{ i }}" required>
-                <input type="radio" name="correct{{ i }}" value="1" required> Correct<br>
+                <input type="radio" name="correct_{{ i }}" value="1" required> Correct<br>
 
                 <label>Option 2:</label>
                 <input type="text" name="option2_{{ i }}" required>
-                <input type="radio" name="correct{{ i }}" value="2"> Correct<br>
+                <input type="radio" name="correct_{{ i }}" value="2"> Correct<br>
 
                 <label>Option 3:</label>
                 <input type="text" name="option3_{{ i }}" required>
-                <input type="radio" name="correct{{ i }}" value="3"> Correct<br>
+                <input type="radio" name="correct_{{ i }}" value="3"> Correct<br>
             </fieldset>
             <br>
         {% endfor %}
-        <input type="submit" value="Submit Questions">
+        <input type="submit" value="✅ Submit Questions">
     </form>
 </body>
 </html>

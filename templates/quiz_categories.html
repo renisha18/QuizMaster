@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Select a Quiz Category</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h1>🧠 Choose a Quiz Category</h1>
+    <ul>
+        {% for category in categories %}
+            <li>
+                {{ category.name }}
+                <a href="{{ url_for('show_quiz', category_id=category.id) }}">
+                    <button>📝 Take Quiz</button>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{{ url_for('index') }}">🔙 Back to Home</a>
+</body>
+</html>

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>New Quiz</title>
+</head>
+<body>
+    <h1>📚 All Existing Quiz Categories</h1>
+    <ul>
+        {% for category in categories %}
+            <li><a href="{{ url_for('view_questions_in_category', category_id=category.id) }}">{{ category.name }}</a></li>
+        {% endfor %}
+    </ul>
+
+    <hr>
+
+    <h2>➕ Add New Quiz Category</h2>
+    <form method="POST" action="/add_category">
+        <input type="text" name="category" placeholder="Enter Category Name" required>
+        <button type="submit">Add Category</button>
+    </form>
+</body>
+</html>
